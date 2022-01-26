@@ -2,10 +2,13 @@ use std::io;
 use std::fs::{self, DirEntry};
 use std::path::Path;
 use std::collections::HashMap;
+use std::env;
 
 fn main() {
     let mut map: HashMap<String, f64> = HashMap::new();
-    get_entries(Path::new("/home/abc/Downloads/test_images"), &mut map);
+    let args: Vec<String> = env::args().collect();
+    let path  = &args[1]; // "/home/abc/Downloads/test_images"
+    get_entries(Path::new(path), &mut map);
     let mut count_vec: Vec<_> = map.iter().collect();
     let sorted_vec: Vec<(&String, &f64)> = sort_metadata(count_vec);
     println!("{:?}", sorted_vec);
