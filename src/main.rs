@@ -1,25 +1,33 @@
 use std::io;
 use std::fs::{self, DirEntry};
 use std::path::Path;
+use std::collections::HashMap;
 
 fn main() {
-    let mut vec1: Vec<&str> = Vec::new();
-    get_entries(Path::new("/home/abc/Documents/rs_sizer"));
+    let mut map: HashMap<String, f64> = HashMap::new();
+    get_entries(Path::new("/home/abc/Downloads"), &mut map);
+    println!("{:?}", map);
 
 }
 
-fn get_entries(path: &Path) -> io::Result<()> {
-    for entry in fs::read_dir(path)? {
+fn get_entries(dir: &Path, map: &mut HashMap<String, f64>) -> io::Result<()> {
+    for entry in fs::read_dir(dir)? {
         let entry = entry?;
         let path = entry.path();
         if path.is_dir() {
-            get_entries(path.as_path());
+            get_entries(path.as_path(), map);
         } else {
-            let mut filename = path.to_str().unwrap();
-            //vec1.push(&filename);
-            println!("{:?}", path);
+            let filename = path.to_str().unwrap().to_string();
+            let file_size = fs::metadata(&filename)?.len();
+            
+            map.insert(filename, bytes_to_megabyte(file_size));
+        
         }
 
     }
     Ok(())     
+}
+
+fn bytes_to_megabyte(bytes: u64) -> f64 {
+    bytes as f64 * 0.000001 as f64
 }
